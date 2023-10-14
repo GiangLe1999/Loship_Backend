@@ -53,11 +53,15 @@ export class UsersService {
       }
 
       // Make a JWT and give it to the user
-      const token = this.jwtService.sign({ id: user.id });
+      const token = this.jwtService.sign(user.id);
 
       return { ok: true, token };
     } catch (error) {
       return { ok: false, error };
     }
+  }
+
+  async findById(id: number): Promise<User> {
+    return await this.users.findOneBy({ id });
   }
 }

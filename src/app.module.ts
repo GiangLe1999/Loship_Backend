@@ -13,6 +13,9 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
 import { JwtModule } from './jwt/jwt.module';
 import { JwtMiddleware } from './jwt/jwt.middleware';
+import { AuthModule } from './auth/auth.module';
+import { Verification } from './users/entities/verification.entity';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -28,6 +31,9 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
+        MAIL_HOST: Joi.string().required(),
+        MAIL_FROM: Joi.string().required(),
+        MAIL_PASSWORD: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -39,7 +45,7 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
       database: process.env.DB_NAME,
       synchronize: process.env.ENV !== 'prod',
       logging: true,
-      entities: [User],
+      entities: [User, Verification],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -47,7 +53,9 @@ import { JwtMiddleware } from './jwt/jwt.middleware';
       context: ({ req }) => ({ user: req['user'] }),
     }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
+    MailModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

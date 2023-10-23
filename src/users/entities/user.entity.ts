@@ -22,7 +22,7 @@ registerEnumType(UserRole, { name: 'UserRole' });
 @ObjectType()
 @Entity()
 export class User extends CoreEntity {
-  @Column()
+  @Column({ unique: true })
   @Field(() => String)
   @IsEmail()
   email: string;
@@ -48,8 +48,8 @@ export class User extends CoreEntity {
     if (this.password) {
       try {
         this.password = await bcrypt.hash(this.password, 10);
-      } catch (e) {
-        console.log(e);
+      } catch (error) {
+        console.log(error);
         throw new InternalServerErrorException();
       }
     }

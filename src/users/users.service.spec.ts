@@ -132,7 +132,7 @@ describe('UsersService', () => {
       password: 'Giang19111999@',
     };
 
-    it('shoud fail if user does not exist', async () => {
+    it('should fail if user does not exist', async () => {
       usersRepository.findOne.mockResolvedValue(null);
       const result = await service.login(loginArgs);
 
@@ -142,7 +142,7 @@ describe('UsersService', () => {
       expect(result).toEqual({ ok: false, error: 'User not found' });
     });
 
-    it('shoudl fail if password is wrong', async () => {
+    it('should fail if password is wrong', async () => {
       const mockedUser = {
         checkPassword: jest.fn(() => Promise.resolve(false)),
       };
@@ -152,7 +152,7 @@ describe('UsersService', () => {
       expect(result).toEqual({ ok: false, error: 'Wrong password' });
     });
 
-    it('shoud return token if the password is correct', async () => {
+    it('should return token if the password is correct', async () => {
       const mockedUser = {
         id: 1,
         checkPassword: jest.fn(() => Promise.resolve(true)),
@@ -162,6 +162,12 @@ describe('UsersService', () => {
       expect(jwtService.sign).toHaveBeenCalledTimes(1);
       expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number));
       expect(result).toEqual({ ok: true, token: 'signed-token' });
+    });
+
+    it('should return error on exception', async () => {
+      usersRepository.findOne.mockResolvedValue(new Error());
+      const result = await service.login(loginArgs);
+      expect(result).toEqual({ ok: false, error: 'Could not login' });
     });
   });
 
@@ -177,7 +183,7 @@ describe('UsersService', () => {
     it('should fail if no user is found', async () => {
       usersRepository.findOneByOrFail.mockRejectedValue(new Error());
       const result = await service.findById(1);
-      expect(result).toEqual({ ok: false, error: 'Uset not found' });
+      expect(result).toEqual({ ok: false, error: 'User not found' });
     });
   });
 

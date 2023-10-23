@@ -79,7 +79,7 @@ export class UsersService {
 
       return { ok: true, token };
     } catch (error) {
-      return { ok: false, error };
+      return { ok: false, error: 'Could not login' };
     }
   }
 
@@ -90,7 +90,7 @@ export class UsersService {
         return { ok: true, user };
       }
     } catch (error) {
-      return { ok: false, error: 'Uset not found' };
+      return { ok: false, error: 'User not found' };
     }
   }
 
@@ -138,7 +138,6 @@ export class UsersService {
       }
       return { ok: false, error: 'Verification not found' };
     } catch (error) {
-      console.log(error);
       return { ok: false, error: 'Could not verify email' };
     }
   }

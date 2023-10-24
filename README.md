@@ -18,3 +18,25 @@ The BackEnd of Uber Eats Clone
 - See Profile
 - Edit Profile
 - Verify Email
+
+## Restaurant Entity
+
+- name
+- category
+- address
+- coverImage
+
+## Restaurant CRUD
+
+- Create Restaurant
+- Edit Restaurant
+- Delete Restaurant
+
+- See Categories
+- See Restaurants by Category (pagination)
+- See Restaurants (pagination)
+- See Restaurant
+
+- Create Dish
+- Edit Dish
+- Delete Dish

@@ -40,3 +40,9 @@ The BackEnd of Uber Eats Clone
 - Create Dish
 - Edit Dish
 - Delete Dish
+
+## Order CRUD
+
+- Orders CRUD
+- Orders Subscription (Owner, Customer, Delivery):
+- Payments (CRON)

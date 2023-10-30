@@ -19,6 +19,8 @@ import { Order } from './orders/entities/order.entity';
 import { OrderItem } from './orders/entities/order-item.entity';
 import { CommonModule } from './common/common.module';
 import { PaymentsModule } from './payments/payments.module';
+import { Payment } from './payments/entities/payment.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -56,6 +58,7 @@ import { PaymentsModule } from './payments/payments.module';
         Dish,
         Order,
         OrderItem,
+        Payment,
       ],
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -74,6 +77,7 @@ import { PaymentsModule } from './payments/payments.module';
       },
     }),
     JwtModule.forRoot({ privateKey: process.env.PRIVATE_KEY }),
+    ScheduleModule.forRoot(),
     MailModule,
     UsersModule,
     AuthModule,

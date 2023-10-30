@@ -11,6 +11,7 @@ import { IsBoolean, IsEmail, IsEnum, IsString } from 'class-validator';
 import { CoreEntity } from 'src/common/entities/core.entity';
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 import { Order } from 'src/orders/entities/order.entity';
+import { Payment } from 'src/payments/entities/payment.entity';
 
 export enum UserRole {
   Owner = 'Owner',
@@ -55,6 +56,13 @@ export class User extends CoreEntity {
   @Field(() => [Order])
   @OneToMany(() => Order, (order) => order.driver)
   rides: Order[];
+
+  @Field(() => [Payment], { nullable: true })
+  @OneToMany(() => Payment, (payment) => payment.user, {
+    eager: true,
+    nullable: true,
+  })
+  payments?: Payment[];
 
   @BeforeInsert()
   @BeforeUpdate()

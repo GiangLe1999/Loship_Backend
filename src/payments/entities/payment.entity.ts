@@ -20,7 +20,7 @@ export class Payment extends CoreEntity {
   userId: number;
 
   @Field(() => Restaurant)
-  @ManyToOne(() => Restaurant)
+  @ManyToOne(() => Restaurant, { onDelete: 'SET NULL' })
   restaurant: Restaurant;
 
   @Field(() => Int)

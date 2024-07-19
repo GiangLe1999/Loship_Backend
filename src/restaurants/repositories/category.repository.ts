@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Category } from '../entities/category.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import slugify from 'slugify';
 
 @Injectable()
 export class CategoryRepository extends Repository<Category> {
@@ -15,8 +16,8 @@ export class CategoryRepository extends Repository<Category> {
 
   async getOrCreate(name: string): Promise<Category> {
     // Category
-    const categoryName = name.trim().toLowerCase();
-    const categorySlug = categoryName.replace(/ /g, '-');
+    const categoryName = name.trim();
+    const categorySlug = slugify(categoryName, { locale: 'vi', lower: true });
     // Find existed category
     let category = await this.categories.findOne({
       where: { slug: categorySlug },

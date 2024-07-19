@@ -29,6 +29,11 @@ import { CreateDishInput, CreateDishOutput } from './dtos/create-dish.dto';
 import { Dish } from './entities/dish.entity';
 import { EditDishInput, EditDishOutput } from './dtos/edit-dish.dto';
 import { DeleteDishInput, DeleteDishOutput } from './dtos/delete-dish.dto';
+import { MyRestaurantsOutput } from './dtos/my-restaurants.dto';
+import {
+  MyRestaurantInput,
+  MyRestaurantOutput,
+} from './dtos/my-restaurant.dto';
 
 @Injectable()
 export class RestaurantService {
@@ -64,6 +69,7 @@ export class RestaurantService {
 
       return {
         ok: true,
+        restaurantId: newRestaurant.id,
       };
     } catch (error) {
       return { ok: false, error: 'Could not create restaurant' };
@@ -168,15 +174,15 @@ export class RestaurantService {
       // Pagination for Restaurants of Cateogry
       const restaurants = await this.restaurants.find({
         where: { category: { slug: category.slug } },
-        take: 25,
-        skip: (categoryInput.page - 1) * 25,
+        take: 10,
+        skip: (categoryInput.page - 1) * 10,
       });
 
       // Total Pages of Restaurants
       const totalResults = await this.countRestaurants(category);
-      const totalPages = Math.ceil(totalResults / 25);
+      const totalPages = Math.ceil(totalResults / 10);
 
-      return { ok: true, category, restaurants, totalPages };
+      return { ok: true, category, restaurants, totalResults, totalPages };
     } catch (error) {
       return { ok: false, error: 'Could not load category' };
     }
@@ -187,17 +193,18 @@ export class RestaurantService {
   ): Promise<RestaurantsOutput> {
     try {
       const [restaurants, totalResults] = await this.restaurants.findAndCount({
-        skip: (restaurantInput.page - 1) * 25,
-        take: 25,
+        skip: (restaurantInput.page - 1) * 5,
+        take: 5,
         order: {
           isPromoted: 'DESC',
         },
+        relations: { category: true },
       });
 
       return {
         ok: true,
         results: restaurants,
-        totalPages: Math.ceil(totalResults / 25),
+        totalPages: Math.ceil(totalResults / 5),
         totalResults,
       };
     } catch (error) {
@@ -211,7 +218,7 @@ export class RestaurantService {
     try {
       const restaurant = await this.restaurants.findOne({
         where: { id: restaurantInput.restaurantId },
-        relations: { menu: true },
+        relations: { menu: true, category: true },
       });
 
       if (!restaurant) {
@@ -230,18 +237,66 @@ export class RestaurantService {
     try {
       const [restaurants, totalResults] = await this.restaurants.findAndCount({
         where: { name: ILike(`%${searchRestaurantInput.query}%`) },
-        take: 25,
-        skip: (searchRestaurantInput.page - 1) * 25,
+        take: 10,
+        skip: (searchRestaurantInput.page - 1) * 10,
       });
 
       return {
         ok: true,
         restaurants,
-        totalPages: (searchRestaurantInput.page - 1) * 25,
+        totalPages: (searchRestaurantInput.page - 1) * 10,
         totalResults,
       };
     } catch (error) {
       return { ok: false, error: 'Could not search for restaurant' };
+    }
+  }
+
+  async myRestaurants(owner: User): Promise<MyRestaurantsOutput> {
+    try {
+      const rawRestaurants = await this.restaurants.find({
+        relations: { category: true },
+      });
+
+      const restaurants = rawRestaurants.filter(
+        (restaurant) => restaurant.ownerId === Number(owner.id),
+      );
+
+      return {
+        ok: true,
+        restaurants,
+      };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not find restaurants.',
+      };
+    }
+  }
+
+  async myRestaurant(
+    owner: User,
+    { id }: MyRestaurantInput,
+  ): Promise<MyRestaurantOutput> {
+    try {
+      const restaurant = await this.restaurants.findOne({
+        where: { id },
+        relations: { menu: true, orders: true, category: true },
+      });
+
+      if (restaurant.ownerId !== Number(owner.id)) {
+        return {
+          ok: false,
+          error: 'Not your restaurant.',
+        };
+      }
+
+      return { ok: true, restaurant };
+    } catch (error) {
+      return {
+        ok: false,
+        error: 'Could not find restaurant.',
+      };
     }
   }
 
